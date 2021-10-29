@@ -11,7 +11,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 with open('intents.json', 'r') as json_data:
     intents = json.load(json_data)
 
-FILE = "data.pth"
+FILE = "trained.pth"
 data = torch.load(FILE)
 
 input_size = data["input_size"]
@@ -25,12 +25,13 @@ model = NeuralNet(input_size, hidden_size, output_size).to(device)
 model.load_state_dict(model_state)
 model.eval()
 
-bot_name = "Sam"
-print("Let's chat! (type 'quit' to exit)")
+bot_name = "Lennie"
+print("Let's have a chat! (type 'exit' to stop chatting!)")
+
 while True:
-    # sentence = "do you use credit cards?"
     sentence = input("You: ")
-    if sentence == "quit":
+    if sentence == "exit":
+        print("Thanks for joining me!")
         break
 
     sentence = tokenize(sentence)
@@ -45,9 +46,10 @@ while True:
 
     probs = torch.softmax(output, dim=1)
     prob = probs[0][predicted.item()]
+    print(prob)
     if prob.item() > 0.75:
         for intent in intents['intents']:
-            if tag == intent["tag"]:
+            if tag == intent['tag']:
                 print(f"{bot_name}: {random.choice(intent['responses'])}")
     else:
-        print(f"{bot_name}: I do not understand...")
+        print(f"{bot_name}: I do not understand. Try to be more specific")
